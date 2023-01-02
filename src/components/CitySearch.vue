@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-    h1 Welcome!
+    h1 Welcome! Check your Air Quality today!
     form(@submit.prevent="getData()")
         label(for="location") Location:
             input#location(type="text", v-model="location" @keyup.enter="getData()" required)
@@ -30,7 +30,6 @@ export default {
             threshold: 50,
             aqi: 0, // air quality indicator
             attributions: [],
-            message: '',
             success: false,
         }
     },
