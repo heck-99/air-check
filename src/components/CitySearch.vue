@@ -2,7 +2,7 @@
 div
     h1 Welcome! Check your Air Quality today!
     form(@submit.prevent="getData()")
-        label(for="location") Location:
+        label(for="location") City:
             input#location(type="text", v-model="location" @keyup.enter="getData()" required)
         label(for="threshold") Desired AQI Threshold:
             select(v-model="threshold")
@@ -11,7 +11,7 @@ div
         button(type="submit") Search
     section
         h1 {{ message }}
-        h3(v-if="success") Today's AQI: {{ aqi }}
+        h3(v-if="status === 'ok'") Today's AQI: {{ aqi }}
 
 </template>
 
@@ -30,36 +30,38 @@ export default {
             threshold: 50,
             aqi: 0, // air quality indicator
             attributions: [],
-            success: false,
+            status: null,
         }
     },
     computed: {
         message(): string {
-            if(this.success) {
-                return this.aqi < this.threshold ? 'You\'re in the clear!' : 'Air quality does not meet your threshold today!';    return '';
+            if (this.status === 'ok') {
+                return this.aqi < this.threshold ? 'You\'re in the clear!' : 'Air quality does not meet your threshold today!';
+            } else if (this.status === 'error') {
+                return 'Sorry, that is not a valid city!';
             }
-            return 'Sorry, please try again later!';
+            
+            return '';
         }
     },
     methods: {
         async getData() {
+            this.status = null;
             const url = BASE_URL.replace('{city}', this.location);
             fetch(url)
             .then(response => response.json())
             .then(json => {
-                if (json.status === 'ok') {
+                this.status = json.status;
+                if (this.status === 'ok') {
                     // if more of the response were used, would create response class 
                     // would also do more robust response checking
-                    this.success = true;
                     this.aqi = json.data.aqi;
-                    
                 } else {
-                    this.success = false;
                     console.log('error msg:' + json.data);
                 }             
             })
             .catch((response) => {
-                // would check status codes and do external logging in a real app
+                // would check status codes and do external logging to sentry in a real app
                 console.log(response.json());
             })
         }
