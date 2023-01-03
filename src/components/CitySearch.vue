@@ -9,9 +9,9 @@ div
                 option(v-for="[key, value] in thresholds" :value="key") {{ value }}
 
         button(type="submit") Search
-    section(v-if="success")
+    section
         h1 {{ message }}
-        h3 Today's AQI: {{ aqi }}
+        h3(v-if="success") Today's AQI: {{ aqi }}
 
 </template>
 
@@ -54,6 +54,7 @@ export default {
                     this.aqi = json.data.aqi;
                     
                 } else {
+                    this.success = false;
                     console.log('error msg:' + json.data);
                 }             
             })
